@@ -76,7 +76,9 @@ input[type=text]{font:inherit;padding:12px 14px;border:1px solid var(--line);bor
 .legend{display:flex;gap:10px;align-items:center;font-size:.75rem;color:var(--muted);flex-wrap:wrap}
 .legend i{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:middle;margin-right:4px}
 .list{display:flex;flex-direction:column;gap:6px}
-.list .row{display:flex;justify-content:space-between;gap:8px;padding:8px 10px;background:var(--surface);border:1px solid var(--line);border-radius:8px;font-size:.95rem}
+.list .row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 10px;background:var(--surface);border:1px solid var(--line);border-radius:8px;font-size:.95rem;font-weight:400;color:var(--fg);width:100%;text-align:left}
+button.list-btn,.list button.row{cursor:pointer}
+.list .row.sel{border-color:var(--accent);background:var(--accent-soft)}
 .list .row .who{color:var(--muted);font-size:.85rem;text-align:right;min-width:0;overflow-wrap:anywhere}
 .chips{display:flex;flex-wrap:wrap;gap:6px}
 .chip{background:var(--accent-soft);padding:4px 10px;border-radius:999px;font-size:.85rem}
@@ -186,7 +188,18 @@ input[type=text]{font:inherit;padding:12px 14px;border:1px solid var(--line);bor
       </div>
       <div class="stack" id="people-wrap" hidden>
         <span class="eyebrow">Responses</span>
+        <p class="muted" style="font-size:.85rem">Tap a name to see just their blocks.</p>
         <div class="list" id="people-list"></div>
+      </div>
+      <div class="stack" id="person-wrap" hidden>
+        <div class="topbar">
+          <span class="eyebrow" id="person-title"></span>
+          <button class="btn-ghost" id="person-close" type="button">Show everyone</button>
+        </div>
+        <div class="heat-wrap">
+          <div class="hours" id="person-hours"></div>
+          <div class="heat" id="person-heat"></div>
+        </div>
       </div>
     </div>
   </section>
@@ -328,7 +341,7 @@ input[type=text]{font:inherit;padding:12px 14px;border:1px solid var(--line);bor
   }
   function renderDashboard(){
     const n=responses.length;
-    const wraps=["stats","unan-wrap","almost-wrap","heat-wrap-outer","people-wrap"];
+    const wraps=["stats","unan-wrap","almost-wrap","heat-wrap-outer","people-wrap"]; $("person-wrap").hidden=true;
     if(n===0){
       $("dash-status").hidden=false; $("dash-status").textContent="No responses yet. Be the first to submit availability.";
       wraps.forEach(w=>$(w).hidden=true); return;
@@ -360,9 +373,34 @@ input[type=text]{font:inherit;padding:12px 14px;border:1px solid var(--line);bor
       heat.appendChild(b);
     }));
     $("legend").innerHTML=['Nobody','Some','Half+','Most','Everyone'].map((t,i)=>'<span><i style="background:var(--heat-'+i+')"></i>'+t+'</span>').join("");
-    $("people-list").innerHTML=responses.slice().sort((a,b)=>(a.name||"").localeCompare(b.name||"")).map(r=>
-      '<div class="row"><span>'+esc(r.name||"?")+'</span><span class="who">'+(r.slots||[]).length+' blocks</span></div>').join("");
+    const pl=$("people-list"); pl.innerHTML="";
+    responses.slice().sort((a,b)=>(a.name||"").localeCompare(b.name||"")).forEach(r=>{
+      const b=document.createElement("button"); b.type="button"; b.className="row"+(selPerson===r.name?" sel":"");
+      b.innerHTML='<span>'+esc(r.name||"?")+'</span><span class="who">'+(r.slots||[]).length+' blocks</span>';
+      b.addEventListener("click",()=>{ selPerson=(selPerson===r.name)?null:r.name; selCell=null; renderDashboard(); });
+      pl.appendChild(b);
+    });
+    renderPerson();
   }
+  let selPerson=null;
+  function renderPerson(){
+    const wrap=$("person-wrap");
+    const r=selPerson&&responses.find(x=>x.name===selPerson);
+    if(!r){ wrap.hidden=true; return; }
+    wrap.hidden=false;
+    $("person-title").textContent=r.name+"'s availability";
+    const set=new Set(r.slots||[]);
+    const heat=$("person-heat"); heat.innerHTML="";
+    SHORT.forEach(s=>{const d=document.createElement("div");d.className="h";d.textContent=s;heat.appendChild(d);});
+    HOURS.forEach(h=>DAYS.forEach((_,d)=>{
+      const c=document.createElement("div"); c.className="c"; const on=set.has(slotKey(d,h));
+      c.style.background=on?"var(--heat-4)":"var(--heat-0)"; c.textContent=on?"✓":""; if(on) c.classList.add("l4");
+      heat.appendChild(c);
+    }));
+    $("person-hours").innerHTML='<div class="sp"></div>'+HOURS.map(h=>'<div>'+fmt(h)+'</div>').join("");
+    wrap.scrollIntoView({behavior:"smooth",block:"start"});
+  }
+  $("person-close").addEventListener("click",()=>{ selPerson=null; renderDashboard(); });
   function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
 
   function route(){ if(location.hash==="#dashboard") show("dashboard"); else show("home"); }
