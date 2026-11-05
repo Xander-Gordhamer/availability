@@ -64,7 +64,7 @@ input[type=text]{font:inherit;padding:12px 14px;border:1px solid var(--line);bor
 .stat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
 .stat b{font-family:var(--display);font-size:1.6rem;display:block;line-height:1.1}
 .stat span{font-size:.8rem;color:var(--muted)}
-.heat{display:grid;gap:4px;grid-template-columns:repeat(5,1fr)}
+.heat{display:grid;gap:4px;grid-template-columns:repeat(6,1fr)}
 .heat .h{text-align:center;font-size:.72rem;color:var(--muted);font-weight:600;letter-spacing:.04em}
 .heat .c{height:30px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-variant-numeric:tabular-nums;border:1px solid transparent;color:var(--fg);padding:0}
 .heat .c.l3,.heat .c.l4{color:var(--accent-fg)}
@@ -95,9 +95,9 @@ input[type=text]{font:inherit;padding:12px 14px;border:1px solid var(--line);bor
   <section class="view" id="view-home">
     <div class="center">
       <div>
-        <div class="home-art">M–F</div>
+        <div class="home-art">M–Sa</div>
         <h1>Weekly Availability</h1>
-        <p class="muted" style="margin-top:8px">Mark the hour blocks you can meet, Monday through Friday. Everyone's answers combine on the dashboard.</p>
+        <p class="muted" style="margin-top:8px">Mark the hour blocks you can meet, Monday through Saturday. Everyone's answers combine on the dashboard.</p>
       </div>
       <div class="stack">
         <button class="btn-primary" id="btn-start">Submit availability</button>
@@ -211,8 +211,8 @@ input[type=text]{font:inherit;padding:12px 14px;border:1px solid var(--line);bor
   const TABLE="weekly_availability";
   const sb=window.supabase?window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY):null;
 
-  const DAYS=["Monday","Tuesday","Wednesday","Thursday","Friday"];
-  const SHORT=["Mon","Tue","Wed","Thu","Fri"];
+  const DAYS=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  const SHORT=["Mon","Tue","Wed","Thu","Fri","Sat"];
   const HOUR_START=7, HOUR_END=21;
   const HOURS=[]; for(let h=HOUR_START;h<=HOUR_END;h++) HOURS.push(h);
   const fmt=h=>{const ap=h>=12?"PM":"AM"; const hh=h%12===0?12:h%12; return hh+" "+ap;};
