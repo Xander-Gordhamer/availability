@@ -2,386 +2,174 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Weekly Availability</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Source+Sans+3:wght@400;600&display=swap">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Topgolf on the 19th</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;600&display=swap">
 <style>
-:root{
-  --bg:#f6f4ee; --surface:#ffffff; --fg:#1f2a24; --muted:#6b756f; --line:#dcd8cc;
-  --accent:#1f6f5f; --accent-fg:#ffffff; --accent-soft:#d8ebe4; --mark:#d9742b;
-  --heat-0:#f1efe8; --heat-1:#cfe4da; --heat-2:#9fcdb8; --heat-3:#5fae8f; --heat-4:#1f6f5f;
-  --display:"Fraunces",Georgia,serif; --body:"Source Sans 3","Segoe UI",system-ui,sans-serif;
-  color-scheme:light;
+:root {
+  --bg: #f3f6ef; --card: #ffffff; --fg: #16201a; --muted: #5d6b62; --line: #d6ddd2;
+  --turf: #1d7a46; --turf-ink: #ffffff; --flag: #e8562a;
+  --display: "Archivo Black", "Archivo", Impact, system-ui, sans-serif;
+  --body: "Archivo", "Helvetica Neue", Arial, system-ui, sans-serif;
 }
-@media (prefers-color-scheme: dark){ :root{
-  --bg:#171c19; --surface:#202723; --fg:#e8ebe6; --muted:#98a39c; --line:#343d37;
-  --accent:#6fc3a5; --accent-fg:#0f1a15; --accent-soft:#223b32; --mark:#f0954a;
-  --heat-0:#262d29; --heat-1:#2b4b3f; --heat-2:#2f6b55; --heat-3:#3f9474; --heat-4:#6fc3a5;
-  color-scheme:dark } }
-html,body{height:100%}
-body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.4;
-  padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-*{box-sizing:border-box}
-[hidden]{display:none!important}
-.app{height:100%;display:flex;flex-direction:column;max-width:680px;margin:0 auto;
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:12px 16px}
-h1,h2{font-family:var(--display);font-weight:700;margin:0;text-wrap:balance;line-height:1.1}
-h1{font-size:2.2rem}
-h2{font-size:1.4rem}
-p{margin:0}
-.muted{color:var(--muted)}
-.eyebrow{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
-button{font:inherit;cursor:pointer;border:0;border-radius:10px;padding:12px 18px;font-weight:600}
-button:focus-visible,input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
-.btn-primary{background:var(--accent);color:var(--accent-fg)}
-.btn-secondary{background:var(--surface);color:var(--fg);border:1px solid var(--line)}
-.btn-ghost{background:transparent;color:var(--accent);padding:8px 10px}
-.btn-primary:disabled{opacity:.5;cursor:not-allowed}
-.view{flex:1;display:flex;flex-direction:column;gap:16px;min-height:0}
-.topbar{display:flex;align-items:center;justify-content:space-between;gap:8px}
-input[type=text]{font:inherit;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--fg);width:100%}
-.stack{display:flex;flex-direction:column;gap:12px}
-.center{flex:1;display:flex;flex-direction:column;justify-content:center;gap:24px}
-.home-art{font-family:var(--display);font-size:5rem;line-height:1;color:var(--accent);font-weight:500}
-.notice.warn{border:1px solid var(--line);color:var(--muted);padding:10px 12px;border-radius:8px;font-size:.9rem}
-.daynav{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.daynav h2{flex:1;text-align:center}
-.dots{display:flex;gap:6px;justify-content:center}
-.dot{width:7px;height:7px;border-radius:50%;background:var(--line)}
-.dot.on{background:var(--accent)}
-.carousel{flex:1;min-height:0;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;gap:16px;-webkit-overflow-scrolling:touch}
-.carousel::-webkit-scrollbar{display:none}
-.panel{flex:0 0 100%;scroll-snap-align:start;overflow-y:auto;display:flex;flex-direction:column;gap:6px;padding-bottom:8px;min-width:0}
-.cell{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px 14px;border-radius:9px;background:var(--surface);border:1px solid var(--line);text-align:left;font-weight:400;min-height:46px;color:var(--fg);user-select:none;-webkit-user-select:none}
-.cell .t{font-variant-numeric:tabular-nums;font-weight:600;min-width:5.5ch}
-.cell.on{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
-.cell.on .mark{opacity:1}
-.mark{opacity:0;font-weight:600}
-.footer{display:flex;gap:10px;justify-content:space-between;align-items:center;padding-top:4px;border-top:1px solid var(--line)}
-.footer .btn-primary{flex:1}
-.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.stat{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
-.stat b{font-family:var(--display);font-size:1.6rem;display:block;line-height:1.1}
-.stat span{font-size:.8rem;color:var(--muted)}
-.heat{display:grid;gap:4px;grid-template-columns:repeat(6,1fr)}
-.heat .h{text-align:center;font-size:.72rem;color:var(--muted);font-weight:600;letter-spacing:.04em}
-.heat .c{height:30px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:.75rem;font-variant-numeric:tabular-nums;border:1px solid transparent;color:var(--fg);padding:0}
-.heat .c.l3,.heat .c.l4{color:var(--accent-fg)}
-.heat .c.sel{border-color:var(--fg)}
-.heat .c.mine{box-shadow:inset 0 0 0 3px var(--mark)}
-.heat-wrap{display:grid;grid-template-columns:4ch 1fr;gap:6px;align-items:start}
-.hours{display:grid;gap:4px;font-size:.72rem;color:var(--muted);font-variant-numeric:tabular-nums;text-align:right}
-.hours div{height:30px;display:flex;align-items:center;justify-content:flex-end}
-.hours .sp{height:17px}
-.legend{display:flex;gap:10px;align-items:center;font-size:.75rem;color:var(--muted);flex-wrap:wrap}
-.legend i{display:inline-block;width:14px;height:14px;border-radius:3px;vertical-align:middle;margin-right:4px}
-.list{display:flex;flex-direction:column;gap:6px}
-.list .row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 10px;background:var(--surface);border:1px solid var(--line);border-radius:8px;font-size:.95rem;font-weight:400;color:var(--fg);width:100%;text-align:left}
-button.list-btn,.list button.row{cursor:pointer}
-.list .row.sel{border-color:var(--mark);box-shadow:inset 0 0 0 2px var(--mark)}
-.list .row .who{color:var(--muted);font-size:.85rem;text-align:right;min-width:0;overflow-wrap:anywhere}
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{background:var(--accent-soft);padding:4px 10px;border-radius:999px;font-size:.85rem}
-.dash-scroll{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:18px;padding-bottom:12px}
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;padding:16px;padding-bottom:max(16px,env(safe-area-inset-bottom,0px));z-index:20}
-.modal{background:var(--surface);color:var(--fg);border-radius:14px;padding:20px;width:100%;max-width:420px;display:flex;flex-direction:column;gap:14px}
-.modal .actions{display:flex;gap:10px}
-.modal .actions button{flex:1}
-@media (min-width:600px){.overlay{align-items:center}}
-@media (prefers-reduced-motion:no-preference){.carousel{scroll-behavior:smooth}}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #101713; --card: #18221c; --fg: #eef3ea; --muted: #9eab9f; --line: #2a3a2f;
+    --turf: #2f9b5c; --turf-ink: #0d1a12; --flag: #ff7a4d; color-scheme: dark; }
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); margin: 0; padding: 28px 16px 48px; line-height: 1.5; }
+main { max-width: 560px; margin: 0 auto; display: grid; gap: 28px; }
+header { display: grid; gap: 6px; }
+.eyebrow { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--turf); font-weight: 600; }
+h1 { font-family: var(--display); font-size: clamp(34px, 9vw, 52px); line-height: .95; margin: 0; letter-spacing: -.01em; }
+.date { color: var(--muted); font-size: 15px; }
+form { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 22px; display: grid; gap: 20px; }
+label.field { display: grid; gap: 8px; font-weight: 600; font-size: 15px; }
+input[type=text] { font: inherit; font-weight: 400; padding: 12px 14px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--bg); color: var(--fg); width: 100%; }
+input[type=text]:focus { outline: 3px solid color-mix(in srgb, var(--turf) 35%, transparent); border-color: var(--turf); }
+fieldset { border: 0; padding: 0; margin: 0; display: grid; gap: 8px; }
+legend { font-weight: 600; font-size: 15px; padding: 0; margin-bottom: 8px; }
+.seg { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.seg label { position: relative; display: block; text-align: center; padding: 12px; border-radius: 10px; border: 1.5px solid var(--line); cursor: pointer; font-weight: 600; user-select: none; transition: background .15s, border-color .15s; }
+.seg input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; }
+.seg label:has(input:checked) { background: var(--turf); border-color: var(--turf); color: var(--turf-ink); }
+.seg label:has(input:focus-visible) { outline: 3px solid color-mix(in srgb, var(--turf) 35%, transparent); }
+button { font: inherit; font-weight: 600; font-size: 16px; padding: 14px; border-radius: 10px; border: 0; background: var(--flag); color: #fff; cursor: pointer; }
+button:disabled { opacity: .55; cursor: default; }
+button:focus-visible { outline: 3px solid color-mix(in srgb, var(--flag) 40%, transparent); }
+.note { font-size: 14px; color: var(--muted); min-height: 1.2em; }
+.note.ok { color: var(--turf); font-weight: 600; }
+.note.err { color: var(--flag); }
+section.tally { display: grid; gap: 12px; }
+.tally h2 { font-family: var(--display); font-size: 20px; margin: 0; display: flex; justify-content: space-between; align-items: baseline; }
+.tally h2 span:last-child { font-size: 14px; font-family: var(--body); color: var(--muted); font-weight: 400; }
+.counts { display: flex; gap: 16px; flex-wrap: wrap; font-size: 14px; color: var(--muted); }
+.counts b { color: var(--fg); font-variant-numeric: tabular-nums; }
+table { width: 100%; border-collapse: collapse; background: var(--card); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+th, td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--line); font-size: 15px; }
+th { font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+tr:last-child td { border-bottom: 0; }
+td.c { text-align: center; }
+.pill { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 13px; font-weight: 600; border: 1px solid var(--line); }
+.pill.yes { background: var(--turf); color: var(--turf-ink); border-color: var(--turf); }
+.empty { padding: 22px 14px; color: var(--muted); font-size: 14px; }
+@media (prefers-reduced-motion: reduce) { .seg label { transition: none; } }
 </style>
 </head>
 <body>
-<div class="app">
+<main>
+  <header>
+    <div class="eyebrow">RSVP</div>
+    <h1>Topgolf on the 19th</h1>
+    <div class="date">Thursday, November 19 · let us know if you're in</div>
+  </header>
 
-  <section class="view" id="view-home">
-    <div class="center">
-      <div>
-        <div class="home-art">M–Sa</div>
-        <h1>Weekly Availability</h1>
-        <p class="muted" style="margin-top:8px">Mark the hour blocks you can meet, Monday through Saturday. Everyone's answers combine on the dashboard.</p>
+  <form id="rsvp" autocomplete="off">
+    <label class="field" for="name">Your name
+      <input type="text" id="name" name="name" placeholder="First and last" required maxlength="80">
+    </label>
+
+    <fieldset>
+      <legend>Are you coming on the 19th?</legend>
+      <div class="seg">
+        <label><input type="radio" name="going" value="yes" required><span>Yes, I'm in</span></label>
+        <label><input type="radio" name="going" value="no"><span>Can't make it</span></label>
       </div>
-      <div class="stack">
-        <button class="btn-primary" id="btn-start">Submit availability</button>
-        <button class="btn-secondary" id="btn-dash">View dashboard</button>
+    </fieldset>
+
+    <fieldset>
+      <legend>Have you been to Topgolf before?</legend>
+      <div class="seg">
+        <label><input type="radio" name="been" value="yes" required><span>Yes</span></label>
+        <label><input type="radio" name="been" value="no"><span>First time</span></label>
       </div>
-      <p class="notice warn" id="home-note" hidden></p>
-    </div>
+    </fieldset>
+
+    <button type="submit" id="submit">Send my RSVP</button>
+    <div class="note" id="note" aria-live="polite"></div>
+  </form>
+
+  <section class="tally">
+    <h2><span>Who's in</span><span id="total"></span></h2>
+    <div class="counts" id="counts"></div>
+    <table>
+      <thead><tr><th>Name</th><th class="c">Going</th><th class="c">Been before</th></tr></thead>
+      <tbody id="rows"><tr><td colspan="3" class="empty">Loading…</td></tr></tbody>
+    </table>
   </section>
-
-  <section class="view" id="view-name" hidden>
-    <div class="topbar"><button class="btn-ghost" data-go="home">← Start over</button></div>
-    <div class="center">
-      <div class="stack">
-        <span class="eyebrow">Step 1 of 2</span>
-        <h2>Who's submitting?</h2>
-        <p class="muted">Your name shows next to your blocks on the dashboard. Submitting again under the same name replaces your earlier answer.</p>
-      </div>
-      <form class="stack" id="name-form">
-        <label for="name-input" class="eyebrow">Your name</label>
-        <input type="text" id="name-input" autocomplete="name" placeholder="e.g. Sarah" maxlength="60" required>
-        <button class="btn-primary" type="submit">Continue</button>
-      </form>
-    </div>
-  </section>
-
-  <section class="view" id="view-grid" hidden>
-    <div class="topbar">
-      <button class="btn-ghost" data-go="home">← Start over</button>
-      <span class="eyebrow" id="grid-who"></span>
-    </div>
-    <div class="daynav">
-      <button class="btn-ghost" id="prev-day" aria-label="Previous day">‹</button>
-      <h2 id="day-title">Monday</h2>
-      <button class="btn-ghost" id="next-day" aria-label="Next day">›</button>
-    </div>
-    <div class="dots" id="dots"></div>
-    <p class="muted" id="grid-note" style="font-size:.85rem;text-align:center">Tap an hour to mark it free. Swipe for the next day.</p>
-    <div class="carousel" id="carousel"></div>
-    <div class="footer">
-      <span class="muted" id="count-label">0 blocks</span>
-      <button class="btn-primary" id="btn-submit">Submit</button>
-    </div>
-  </section>
-
-  <section class="view" id="view-done" hidden>
-    <div class="center">
-      <div class="stack">
-        <h2 id="done-title">Saved</h2>
-        <p class="muted" id="done-text"></p>
-      </div>
-      <div class="stack">
-        <button class="btn-primary" data-go="dashboard">View dashboard</button>
-        <button class="btn-secondary" data-go="home">Back to start</button>
-      </div>
-    </div>
-  </section>
-
-  <section class="view" id="view-dashboard" hidden>
-    <div class="topbar">
-      <button class="btn-ghost" data-go="home">← Start</button>
-      <button class="btn-ghost" id="btn-refresh">Refresh</button>
-    </div>
-    <h2>Who's free when</h2>
-    <div class="dash-scroll">
-      <p class="muted" id="dash-status">Loading responses…</p>
-      <div class="stats" id="stats" hidden>
-        <div class="stat"><b id="st-people">0</b><span>people responded</span></div>
-        <div class="stat"><b id="st-unan">0</b><span>blocks everyone can make</span></div>
-      </div>
-      <div class="stack" id="unan-wrap" hidden>
-        <span class="eyebrow">Everyone can make it</span>
-        <div class="chips" id="unan-list"></div>
-      </div>
-      <div class="stack" id="almost-wrap" hidden>
-        <span class="eyebrow">All but one</span>
-        <div class="list" id="almost-list"></div>
-      </div>
-      <div class="stack" id="heat-wrap-outer" hidden>
-        <span class="eyebrow" id="heat-eyebrow">Overlap by hour</span>
-        <div class="heat-wrap">
-          <div class="hours" id="hours"></div>
-          <div class="heat" id="heat"></div>
-        </div>
-        <div class="legend" id="legend"></div>
-        <p class="muted" id="cell-detail" style="font-size:.9rem;min-height:1.3em">Tap a block to see who's free then.</p>
-      </div>
-      <div class="stack" id="people-wrap" hidden>
-        <span class="eyebrow">Responses</span>
-        <p class="muted" style="font-size:.85rem">Tap a name to highlight their blocks in the grid above. Tap again to clear.</p>
-        <div class="list" id="people-list"></div>
-      </div>
-    </div>
-  </section>
-
-</div>
-
-<div class="overlay" id="confirm" hidden>
-  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
-    <h2 id="confirm-title">Submit availability?</h2>
-    <p class="muted" id="confirm-text"></p>
-    <div class="actions">
-      <button class="btn-secondary" id="confirm-no">Go back</button>
-      <button class="btn-primary" id="confirm-yes">Yes, submit</button>
-    </div>
-  </div>
-</div>
+</main>
 
 <script>
-(function(){
-  const SUPABASE_URL="https://pfmdhnhvnnhyuaqfnblp.supabase.co";
-  const SUPABASE_KEY="sb_publishable_Hy-UZ3Vhsao8SAgUUl-GYA_dmQsHWR9";
-  const TABLE="weekly_availability";
-  const sb=window.supabase?window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY):null;
+(() => {
+  const SUPABASE_URL = 'https://pfmdhnhvnnhyuaqfnblp.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_Hy-UZ3Vhsao8SAgUUl-GYA_dmQsHWR9';
+  const TABLE = 'topgolf_rsvps';
+  const endpoint = `${SUPABASE_URL}/rest/v1/${TABLE}`;
+  const headers = { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' };
 
-  const DAYS=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
-  const SHORT=["Mon","Tue","Wed","Thu","Fri","Sat"];
-  const HOUR_START=7, HOUR_END=21;
-  const HOURS=[]; for(let h=HOUR_START;h<=HOUR_END;h++) HOURS.push(h);
-  const fmt=h=>{const ap=h>=12?"PM":"AM"; const hh=h%12===0?12:h%12; return hh+" "+ap;};
-  const slotKey=(d,h)=>d+"-"+h;
-  const $=id=>document.getElementById(id);
+  const form = document.getElementById('rsvp');
+  const note = document.getElementById('note');
+  const btn = document.getElementById('submit');
+  const rows = document.getElementById('rows');
+  const counts = document.getElementById('counts');
+  const total = document.getElementById('total');
 
-  let name="", selected=new Set(), day=0, pollT=null;
+  const say = (msg, cls) => { note.textContent = msg; note.className = 'note' + (cls ? ' ' + cls : ''); };
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
-  const views=["home","name","grid","done","dashboard"];
-  function show(v){
-    views.forEach(x=>$("view-"+x).hidden=(x!==v));
-    if(v==="dashboard") startDashboard(); else stopDashboard();
-    if(v==="home"){ selected.clear(); name=""; }
-    const h=(v==="dashboard")?"#dashboard":"";
-    if(location.hash!==h) history.replaceState(null,"",location.pathname+location.search+h);
-  }
-  document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>show(b.dataset.go)));
-  $("btn-start").addEventListener("click",()=>{ show("name"); setTimeout(()=>$("name-input").focus(),50); });
-  $("btn-dash").addEventListener("click",()=>show("dashboard"));
-  $("btn-refresh").addEventListener("click",loadResponses);
-
-  $("name-form").addEventListener("submit",e=>{
-    e.preventDefault();
-    const v=$("name-input").value.trim();
-    if(!v) return;
-    name=v; selected.clear(); day=0;
-    $("grid-who").textContent=name;
-    $("grid-note").textContent="Tap an hour to mark it free. Swipe for the next day.";
-    buildGrid(); show("grid"); goDay(0,false);
-    preload(v);
-  });
-  const slugOf=n=>n.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"")||"anon";
-  async function preload(n){
-    if(!sb) return;
-    const {data}=await sb.from(TABLE).select("slots").eq("slug",slugOf(n)).maybeSingle();
-    if(!data||name!==n) return;
-    (data.slots||[]).forEach(k=>selected.add(k));
-    document.querySelectorAll("#carousel .cell").forEach(b=>b.classList.toggle("on",selected.has(b.dataset.key)));
-    updateCount();
-    $("grid-note").textContent="Your earlier answer is loaded. Adjust it and submit to replace it.";
-  }
-
-  function buildGrid(){
-    const car=$("carousel"); car.innerHTML="";
-    const dots=$("dots"); dots.innerHTML="";
-    DAYS.forEach((dn,d)=>{
-      const p=document.createElement("div"); p.className="panel";
-      HOURS.forEach(h=>{
-        const b=document.createElement("button"); b.type="button"; b.className="cell"; b.dataset.key=slotKey(d,h);
-        b.innerHTML='<span class="t">'+fmt(h)+'</span><span class="muted">to '+fmt(h+1)+'</span><span class="mark">✓</span>';
-        b.addEventListener("click",()=>{
-          const k=b.dataset.key;
-          if(selected.has(k)){selected.delete(k);b.classList.remove("on");}
-          else{selected.add(k);b.classList.add("on");}
-          updateCount();
-        });
-        p.appendChild(b);
-      });
-      car.appendChild(p);
-      const dot=document.createElement("span"); dot.className="dot"+(d===0?" on":""); dots.appendChild(dot);
-    });
-    updateCount();
-  }
-  function updateCount(){ const n=selected.size; $("count-label").textContent=n+(n===1?" block":" blocks"); }
-  function setDay(d){
-    day=Math.max(0,Math.min(DAYS.length-1,d));
-    $("day-title").textContent=DAYS[day];
-    [...$("dots").children].forEach((x,i)=>x.classList.toggle("on",i===day));
-  }
-  function goDay(d,smooth){
-    setDay(d);
-    const car=$("carousel"); const w=car.clientWidth+16;
-    car.scrollTo({left:day*w,behavior:smooth?"smooth":"auto"});
-  }
-  $("prev-day").addEventListener("click",()=>goDay(day-1,true));
-  $("next-day").addEventListener("click",()=>goDay(day+1,true));
-  let scrollT=null;
-  $("carousel").addEventListener("scroll",()=>{
-    clearTimeout(scrollT);
-    scrollT=setTimeout(()=>{ const car=$("carousel"); setDay(Math.round(car.scrollLeft/(car.clientWidth+16))); },80);
-  });
-
-  $("btn-submit").addEventListener("click",()=>{
-    const n=selected.size;
-    $("confirm-text").textContent=!sb ? "Saving isn't available right now (couldn't reach the database)."
-      : n===0 ? "You haven't marked any blocks. Submit anyway as "+name+" with no availability?"
-      : "Save "+n+" hour block"+(n===1?"":"s")+" for "+name+"? This replaces any earlier answer under that name.";
-    $("confirm-yes").disabled=!sb;
-    $("confirm").hidden=false;
-  });
-  $("confirm-no").addEventListener("click",()=>$("confirm").hidden=true);
-  $("confirm-yes").addEventListener("click",async()=>{
-    const btn=$("confirm-yes"); btn.disabled=true; btn.textContent="Saving…";
-    const slug=slugOf(name);
-    const slots=[...selected].sort();
-    const {error}=await sb.from(TABLE).upsert({slug,name,slots,updated_at:new Date().toISOString()},{onConflict:"slug"});
-    btn.disabled=false; btn.textContent="Yes, submit";
-    if(error){ $("confirm-text").textContent="Couldn't save: "+error.message+". Please try again."; return; }
-    $("confirm").hidden=true;
-    $("done-title").textContent="Saved, "+name;
-    $("done-text").textContent=slots.length+" hour block"+(slots.length===1?"":"s")+" recorded.";
-    show("done");
-  });
-
-  let responses=[], selCell=null;
-  function startDashboard(){ loadResponses(); clearInterval(pollT); pollT=setInterval(loadResponses,20000); }
-  function stopDashboard(){ clearInterval(pollT); pollT=null; }
-  async function loadResponses(){
-    if(!sb){ $("dash-status").hidden=false; $("dash-status").textContent="Couldn't reach the database."; return; }
-    const {data,error}=await sb.from(TABLE).select("name,slots,updated_at");
-    if(error){ $("dash-status").hidden=false; $("dash-status").textContent="Couldn't load responses: "+error.message; return; }
-    responses=data||[]; renderDashboard();
-  }
-  function renderDashboard(){
-    const n=responses.length;
-    const wraps=["stats","unan-wrap","almost-wrap","heat-wrap-outer","people-wrap"];
-    if(n===0){
-      $("dash-status").hidden=false; $("dash-status").textContent="No responses yet. Be the first to submit availability.";
-      wraps.forEach(w=>$(w).hidden=true); return;
+  const render = list => {
+    // Keep only the latest reply per name so people can change their answer.
+    const latest = new Map();
+    for (const r of list) latest.set(r.name.trim().toLowerCase(), r);
+    const rsvps = [...latest.values()];
+    if (!rsvps.length) {
+      rows.innerHTML = '<tr><td colspan="3" class="empty">No RSVPs yet. Be the first to answer above.</td></tr>';
+      counts.innerHTML = ''; total.textContent = ''; return;
     }
-    $("dash-status").hidden=true; wraps.forEach(w=>$(w).hidden=false);
-    const count={}, who={};
-    responses.forEach(r=>(r.slots||[]).forEach(k=>{count[k]=(count[k]||0)+1;(who[k]=who[k]||[]).push(r.name);}));
-    const label=k=>{const [d,h]=k.split("-").map(Number);return SHORT[d]+" "+fmt(h);};
-    const order=(a,b)=>{const [da,ha]=a.split("-").map(Number),[db_,hb]=b.split("-").map(Number);return da-db_||ha-hb;};
-    const unan=Object.keys(count).filter(k=>count[k]===n).sort(order);
-    const almost=n>=3?Object.keys(count).filter(k=>count[k]===n-1).sort(order):[];
-    $("st-people").textContent=n; $("st-unan").textContent=unan.length;
-    $("unan-list").innerHTML=unan.length?unan.map(k=>'<span class="chip">'+label(k)+'</span>').join(""):'<span class="muted">No block works for everyone yet.</span>';
-    $("almost-wrap").hidden=almost.length===0;
-    $("almost-list").innerHTML=almost.map(k=>{
-      const missing=responses.filter(r=>!(r.slots||[]).includes(k)).map(r=>r.name);
-      return '<div class="row"><span>'+label(k)+'</span><span class="who">missing '+esc(missing.join(", "))+'</span></div>';
-    }).join("");
-    $("hours").innerHTML='<div class="sp"></div>'+HOURS.map(h=>'<div>'+fmt(h)+'</div>').join("");
-    const pr=selPerson&&responses.find(x=>x.name===selPerson); if(!pr) selPerson=null;
-    const pset=pr?new Set(pr.slots||[]):null;
-    $("heat-eyebrow").textContent=pr?"Overlap by hour, "+pr.name+" highlighted":"Overlap by hour";
-    const heat=$("heat"); heat.innerHTML="";
-    SHORT.forEach(s=>{const d=document.createElement("div");d.className="h";d.textContent=s;heat.appendChild(d);});
-    HOURS.forEach(h=>DAYS.forEach((_,d)=>{
-      const k=slotKey(d,h), c=count[k]||0;
-      const lvl=c===0?0:c===n?4:c>=n*0.75?3:c>=n*0.5?2:1;
-      const b=document.createElement("button"); b.className="c l"+lvl+(selCell===k?" sel":"")+(pset&&pset.has(k)?" mine":"");
-      b.style.background="var(--heat-"+lvl+")"; b.textContent=c||""; b.title=label(k)+": "+c+" of "+n;
-      b.addEventListener("click",()=>{ selCell=k; renderDashboard();
-        $("cell-detail").textContent=label(k)+": "+(c?who[k].join(", "):"nobody is free")+(c&&c<n?" ("+c+" of "+n+")":""); });
-      heat.appendChild(b);
-    }));
-    $("legend").innerHTML=['Nobody','Some','Half+','Most','Everyone'].map((t,i)=>'<span><i style="background:var(--heat-'+i+')"></i>'+t+'</span>').join("")+(pr?'<span><i style="background:var(--mark)"></i>'+esc(pr.name)+'</span>':'');
-    const pl=$("people-list"); pl.innerHTML="";
-    responses.slice().sort((a,b)=>(a.name||"").localeCompare(b.name||"")).forEach(r=>{
-      const b=document.createElement("button"); b.type="button"; b.className="row"+(selPerson===r.name?" sel":"");
-      b.innerHTML='<span>'+esc(r.name||"?")+'</span><span class="who">'+(r.slots||[]).length+' blocks</span>';
-      b.addEventListener("click",()=>{ selPerson=(selPerson===r.name)?null:r.name; renderDashboard(); });
-      pl.appendChild(b);
-    });
-  }
-  let selPerson=null;
-  function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
+    rsvps.sort((a, b) => (a.going === b.going ? 0 : a.going ? -1 : 1) || a.name.localeCompare(b.name));
+    const going = rsvps.filter(r => r.going).length;
+    const first = rsvps.filter(r => r.going && !r.been_before).length;
+    total.textContent = rsvps.length + (rsvps.length === 1 ? ' reply' : ' replies');
+    counts.innerHTML = `<span><b>${going}</b> going</span><span><b>${rsvps.length - going}</b> can't make it</span><span><b>${first}</b> first-timers going</span>`;
+    rows.innerHTML = rsvps.map(r => `<tr>
+      <td>${esc(r.name)}</td>
+      <td class="c"><span class="pill ${r.going ? 'yes' : ''}">${r.going ? 'Yes' : 'No'}</span></td>
+      <td class="c">${r.been_before ? 'Yes' : 'First time'}</td></tr>`).join('');
+  };
 
-  function route(){ if(location.hash==="#dashboard") show("dashboard"); else show("home"); }
-  window.addEventListener("hashchange",route);
-  route();
-  if(!sb){ $("home-note").hidden=false; $("home-note").textContent="The database script didn't load. Check your connection and reload."; }
+  const load = async () => {
+    try {
+      const res = await fetch(`${endpoint}?select=name,going,been_before,created_at&order=created_at.asc`, { headers });
+      if (!res.ok) throw new Error(res.status);
+      render(await res.json());
+    } catch {
+      rows.innerHTML = '<tr><td colspan="3" class="empty">Could not load the list right now.</td></tr>';
+    }
+  };
+
+  let busy = false;
+  form.addEventListener('submit', async ev => {
+    ev.preventDefault();
+    if (busy) return;
+    const fd = new FormData(form);
+    const name = String(fd.get('name') || '').trim();
+    if (!name || !fd.get('going') || !fd.get('been')) { say('Fill in your name and answer both questions.', 'err'); return; }
+    busy = true; btn.disabled = true; say('Saving…');
+    try {
+      const res = await fetch(endpoint, {
+        method: 'POST', headers: { ...headers, Prefer: 'return=minimal' },
+        body: JSON.stringify({ name, going: fd.get('going') === 'yes', been_before: fd.get('been') === 'yes' })
+      });
+      if (!res.ok) throw new Error(res.status);
+      say(fd.get('going') === 'yes' ? "You're on the list. See you on the 19th." : 'Got it, thanks for letting us know.', 'ok');
+      await load();
+    } catch {
+      say('Could not save. Try again in a moment.', 'err');
+    } finally { busy = false; btn.disabled = false; }
+  });
+
+  load();
+  setInterval(load, 30000);
 })();
 </script>
 </body>
